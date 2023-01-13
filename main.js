@@ -57,6 +57,27 @@ gui.addColor(material, "color");
 gui.add(material, "metalness", 0, 1, 0.001);
 gui.add(material, "roughness", 0, 1, 0.001);
 
+//パーティクルジオメトリ
+const particlesGeometry = new THREE.BufferGeometry();
+const particlesCount = 700;
+const positionArray = new Float32Array(particlesCount * 3);
+
+for (let i = 0; i < particlesCount * 3; i++) {
+  positionArray[i] = (Math.random() - 0.5) * 10;
+}
+particlesGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(positionArray, 3)
+);
+//パーティクルマテリアル
+const particlesMaterial = new THREE.PointsMaterial({
+  size: 0.025,
+  color: "#ffffff",
+});
+//パーティクルメッシュ
+const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+scene.add(particles);
+
 //ライト
 const directionalLight = new THREE.DirectionalLight("#ffffff", 4);
 directionalLight.position.set(0.5, 1, 0);
@@ -97,6 +118,13 @@ const wheelRot = () => {
 };
 wheelRot();
 
+//カーソルの位置取得
+const cursor = { x: 0, y: 0 };
+window.addEventListener("mousemove", (e) => {
+  cursor.x = e.clientX / window.innerWidth - 0.5;
+  cursor.y = e.clientY / window.innerHeight - 0.5;
+});
+
 //アニメーション
 const animate = () => {
   renderer.render(scene, camera);
@@ -105,6 +133,9 @@ const animate = () => {
     mesh.rotation.x += 0.2 * getDeltaTime;
     mesh.rotation.y += 0.2 * getDeltaTime;
   });
+  //カメラの制御
+  camera.position.x += cursor.x * getDeltaTime * 2;
+  camera.position.y += -cursor.y * getDeltaTime * 2;
   window.requestAnimationFrame(animate);
 };
 animate();
